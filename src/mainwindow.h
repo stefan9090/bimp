@@ -22,7 +22,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    bool loadFile(const QString &fileName);
+    QImage loadImage(const std::string &strFileName);
 
 private:
     static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMode acceptMode);

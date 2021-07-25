@@ -1,19 +1,19 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
-#include <iostream>
+#include "Logger.h"
+#include "Utils.h"
 
-#include <QString>
-#include <QSizePolicy>
-#include <QStandardPaths>
 #include <QImageReader>
 #include <QImageWriter>
 #include <QMessageBox>
+#include <QSizePolicy>
+#include <QStandardPaths>
+#include <QString>
 
-MainWindow::MainWindow(QWidget *parent) :
-        QMainWindow(parent),
-        m_pUi(new Ui::MainWindow),
-        m_pImageLabel(new QLabel)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+                                          m_pUi(new Ui::MainWindow),
+                                          m_pImageLabel(new QLabel)
 {
     m_pUi->setupUi(this);
 
@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createActions();
     createMenus();
-
 }
 
 MainWindow::~MainWindow()
@@ -48,60 +47,37 @@ void MainWindow::createMenus()
 
 void MainWindow::open()
 {
-    QFileDialog dialog(this, tr("Open File"));
-    initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
+    std::string strImageDir = Utils::getEnv("BIM_IMAGE_DIR", "/home/stefan/Pictures/test.png");
 
-    while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().constFirst()))
-    {}
+    QImage image = loadImage(strImageDir);
+
+    image.for
+
+    if (!image.isNull())
+    {
+        QPixmap pixmap = QPixmap::fromImage(image);
+        m_pImageLabel->setPixmap(pixmap);
+    }
+
 }
 
-void MainWindow::initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMode acceptMode)
+QImage MainWindow::loadImage(const std::string &strFileName)
 {
-    static bool firstDialog = true;
+    QString strQFileName = QString::fromStdString(strFileName);
 
-    if (firstDialog)
-    {
-        firstDialog = false;
-        const QStringList picturesLocations = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
-        dialog.setDirectory(picturesLocations.isEmpty() ? QDir::currentPath() : picturesLocations.last());
-    }
-
-    QStringList mimeTypeFilters;
-    const QByteArrayList supportedMimeTypes = acceptMode == QFileDialog::AcceptOpen
-                                              ? QImageReader::supportedMimeTypes() : QImageWriter::supportedMimeTypes();
-    for (const QByteArray &mimeTypeName : supportedMimeTypes)
-    {
-        mimeTypeFilters.append(mimeTypeName);
-    }
-    mimeTypeFilters.sort();
-    dialog.setMimeTypeFilters(mimeTypeFilters);
-    dialog.selectMimeTypeFilter("image/jpeg");
-    dialog.setAcceptMode(acceptMode);
-    if (acceptMode == QFileDialog::AcceptSave)
-    {
-        dialog.setDefaultSuffix("jpg");
-    }
-}
-
-bool MainWindow::loadFile(const QString &fileName)
-{
-    std::cout << fileName.toStdString() << std::endl;
-    QImageReader reader(fileName);
+    QImageReader reader(strQFileName);
     reader.setAutoTransform(true);
-    const QImage newImage = reader.read();
+    QImage newImage = reader.read();
     if (newImage.isNull())
     {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("Cannot load %1: %2")
-                                         .arg(QDir::toNativeSeparators(fileName), reader.errorString()));
-        return false;
+                                         .arg(QDir::toNativeSeparators(strQFileName), reader.errorString()));
     }
     else
     {
-        std::cout << "Loaded image \n";
+        LOG_INFO("Loaded file: {}", strFileName);
     }
-    return true;
+
+    return newImage;
 }
-
-
-

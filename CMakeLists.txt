@@ -23,7 +23,8 @@ set(PROJECT_SOURCES
         src/mainwindow.cpp
         src/mainwindow.h
         src/mainwindow.ui
-        src/Logger.cpp src/Logger.h)
+        src/Logger.cpp
+        src/Utils.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(imp-beer

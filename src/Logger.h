@@ -6,11 +6,13 @@
 #define IMP_BEER_LOGGER_H
 
 
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/stdout_sinks.h"
+#include "spdlog/spdlog.h"
 
 #define LOG_ERROR(...) SPDLOG_ERROR(__VA_ARGS__)
+#define LOG_WARNING(...) SPDLOG_WARNING(__VA_ARGS__)
+#define LOG_INFO(...) SPDLOG_INFO(__VA_ARGS__)
 
 class Logging
 {
@@ -19,4 +21,4 @@ public:
 };
 
 
-#endif //IMP_BEER_LOGGER_H
+#endif//IMP_BEER_LOGGER_H
